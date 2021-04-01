@@ -9,29 +9,31 @@ using namespace std;
 const int inf = 1000000000;
 
 int Plc[MAXLG+5][MAXN+10], stp;
-int S[MAXN+10];                     //Sorted Suffixes. . . .
-pair< pair<int,int> , int> L[MAXN+10];
+int S[MAXN+10], n;                     //Sorted Suffixes. . . .
+pair< pair<int,int> , int> C[MAXN+10];
 
-void Generate_SA(string str)
+string str;
+
+void Generate_SA()
 {
-    int i, len = str.size(), cur;
+    int i, len = n, cur;
     for(i=0; i<len; i++)    Plc[0][i] = str[i];
 
     for(cur=stp=1; (cur>>1)<len; cur*=2, stp++)
     {
         for(i=0; i<len; i++)
         {
-            L[i].fi.fi = Plc[stp-1][i];
-            L[i].fi.se = i+cur<len ? Plc[stp-1][i+cur] : -inf; // set it to -inf when dealing with negative numbers
-            L[i].se = i;
+            C[i].fi.fi = Plc[stp-1][i];
+            C[i].fi.se = i+cur<len ? Plc[stp-1][i+cur] : -inf; // set it to -inf when dealing with negative numbers
+            C[i].se = i;
         }
         
-        sort(L, L+len);
+        sort(C, C+len);
         
         for(i=0; i<len; i++)
         {
-            if(!i || L[i-1].fi.fi != L[i].fi.fi || L[i-1].fi.se != L[i].fi.se) Plc[stp][L[i].se] = i;
-            else Plc[stp][L[i].se] = Plc[stp][L[i-1].se];
+            if(!i || C[i-1].fi.fi!=C[i].fi.fi || C[i-1].fi.se!=C[i].fi.se) Plc[stp][C[i].se] = i;
+            else Plc[stp][C[i].se] = Plc[stp][C[i-1].se];
         }
     }
     
@@ -40,25 +42,38 @@ void Generate_SA(string str)
     stp--;
 }
 
-int lcp(int u, int v, int N) // Here N = length of the string **Call Generate_SA(string)**
+int LCP[MAXN+10], PLCP[MAXN+10], Phi[MAXN+10];
+void build_LCP()
 {
-	// Generates two longest equal substring starting from u and v. . . .
-	
-    int ret = 0, k;
-    if(u == v) return N-u;
-    for(k = stp; k >= 0 && u < N && v < N; k--)
-        if(Plc[k][u] == Plc[k][v])
-            ret += 1<<k, u += 1<<k, v += 1<<k;
-    return ret;
+    Phi[S[0]]=-1;
+    for(int i=1; i<n; i++)
+        Phi[S[i]]=S[i-1];
+    for(int i=0,L=0; i<n; i++)
+    {
+//        D(i);
+        if(Phi[i]==-1)
+        {
+            PLCP[i]=0;
+            continue;
+        }
+        while(str[i+L]==str[Phi[i]+L]) L++;
+        PLCP[i] = L;
+        L = max(L-1,0);
+    }
+ 
+    for(int i=0; i<n; i++)
+        LCP[i] = PLCP[S[i]];
 }
-
-string str;
 
 int main()
 {
 	cin >> str;
 	
-    Generate_SA(str);
+	n = str.size();
+	
+    Generate_SA();
+    build_LCP();
+    
     for(int i = 0; i < (int) str.size(); i++){
         cout <<  S[i] << endl;
     }
