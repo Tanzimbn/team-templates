@@ -1,3 +1,4 @@
+// Complexity O(n)
 const int MX = 1e6;
 ll fact[MX+5], inv[MX+5];
 ll bigmod(ll a, ll p, ll M)
