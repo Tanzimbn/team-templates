@@ -1,95 +1,32 @@
-#include <bits/stdc++.h>
-using namespace std;
-
-int sum[400001], num[100001];
-// keep num size 4*n;
-
-/// Building segment trees...
-void build(int at, int L, int R)
+// When M is prime...
+// Whwn A ans M are co-prime.
+ll bigmod(ll a, ll p, ll M)
 {
-	sum[at] = 0;
+    // If 'M' is a prime number, then we can speed up it just by calculating "a^(p%(M-1))";
+	p %= (M-1);
 	
-	if(L==R){
-		// keeping the sum...
-		// Or, maybe other queries...
-		sum[at] = num[L];
-		
-		return;
-	}
-	
-	int mid = (L+R)/2;
-	build(at*2, L, mid);
-	build(at*2+1, mid+1, R);
-	
-	// keeping the sum...
-	// Or, maybe other queries...
-	sum[at] = sum[at*2] + sum[at*2+1];
+    ll result = 1LL;
+    while(p>0LL){
+        if(p&1LL) result = result * a % M;
+        a = a * a % M;
+        p>>=1LL;
+    }
+    return result;
 }
 
-/// Updating segment tree...
-void update(int at, int L, int R, int pos, int u)
-{
-	if(L==R){
-		sum[at] += u;
-		return;
-	}
-	
-	int mid = (L+R)/2;
-	
-	// instead of if-else
-	// we can use 
-	// if(pos < L || R < pos) return;
-	if(pos<=mid) update(at*2, L, mid, pos, u);
-	else update(at*2+1, mid+1, R, pos, u);
-	
-	sum[at] = sum[at*2] + sum[at*2+1];
+ll inverse(ll a, ll M){
+    if(gcd(a, M)==1) return bigmod(a, M-2, M) % M; // (ax)%M = 1
+    return 1;
 }
 
-
-/// Making queries in segment tree...
-int query(int at, int L, int R, int l, int r)
-{
-	// query from l to r.
-	if(r < L || l > R) return 0;
-	if(l <= L && R <= r) return sum[at];
-	
-	int mid = (L+R)/2;
-	int x = query(at*2, L, mid, l, r);
-	int y = query(at*2+1, mid+1, R, l, r);
-	
-	return x+y;
-}
-
-int main()
-{
-	int n, u, q, pos, value, l, r;
-	
-	// Input data(s).
-	cin >> n;
-	for(int K=1; K<=n; K++) cin >> num[K];
-	
-	// build...
-	build(1, 1, n);
-	
-	// update...
-	
-	# handle indexes for 0 based ones. ( This Tamplate is 1 based...)
-	# consider overflow for sum.
-	for(int K=1; K<=4*n; K++) cout << sum[K] << ' ';
-	cout << "\n";
-	
-	cin >> u;
-	while(u--){
-		cin >> pos >> value;
-		update(1, 1, n, pos, value);
-	}
-	
-	// queries...
-	cin >> q;
-	while(q--){
-		cin >> l >> r;
-		cout << query(1, 1, n, l, r) << "\n";
-	}
-	
-	return 0;
+// when M is not prime...
+// Whwn A and M are co-prime.
+ll modInv(ll a, ll m) {
+    int x, y;
+    ext_gcd(a, m, &x, &y);
+ 
+    // Process x so that it is between 0 and m-1
+    x %= m;
+    if (x<0LL) x += m;
+    return x;
 }
