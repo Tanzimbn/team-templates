@@ -1,5 +1,6 @@
 // When M is prime...
 // Whwn A ans M are co-prime.
+// complexity O(logM)
 ll bigmod(ll a, ll p, ll M)
 {
     // If 'M' is a prime number, then we can speed up it just by calculating "a^(p%(M-1))";
@@ -21,6 +22,7 @@ ll inverse(ll a, ll M){
 
 // when M is not prime...
 // Whwn A and M are co-prime.
+// complexity O(log10A+log10B) 
 ll modInv(ll a, ll m) {
     int x, y;
     ext_gcd(a, m, &x, &y);
