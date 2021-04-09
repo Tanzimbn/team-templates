@@ -25,6 +25,7 @@ void factorial()
 	
 	inv[MX] = inverse(fact[MX], mod);
 	for(ll K=MX-1; K>=1; K--) inv[K] = inv[K+1] * (K+1) % mod;
+	inv[0] = 1;
 }
 
 // function call ...
