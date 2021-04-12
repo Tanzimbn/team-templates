@@ -57,10 +57,38 @@ void divs(int n) {
 		printf("%d %d\n", divisors[i].first, divisors[i].second);
 }
 
+// Number of divisors...
+ll NOD(int n)
+{
+	ll ans = 1;
+	
+	for(int K=0; K<sz(divisors); K++){
+		ans *= (ll)(divisors[K].se+1);
+	}
+	
+	return ans;
+}
+//Sum of divisors...
+ll SOD(int n)
+{
+	ll ans = 1, cnt;
+	for(int K=0; K<sz(divisors); K++){
+		cnt = divisors[K].fi;
+		while(divisors[K].se--) cnt *= (ll)divisors[K].fi;
+		
+		ans *= (ll)(cnt-1)/(divisors[K].fi-1);
+	}
+	return ans;
+}
+
+
 int main()
 {
 	sieve(root(n));
+	
 	divs(n);
+	
+	cout << NOD(n) << ' ' << SOD(n) << "\n";
 	
 	return 0;
 }
