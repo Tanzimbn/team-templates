@@ -1,29 +1,3 @@
-// Bitwise - sieve :- prime number generator;
-// 0 for prime, 1 for not prime;  >> Not sure ...
-
-#define MX 1000000000
-
-int marked[MX/64+2];
-vector<int> primes;
-
-#define mark(x) marked[x>>6] |= (1<<((x&63)>>1))
-#define check(x) (marked[x>>6] & (1<<((x&63)>>1)))
-
-bool isPrime(int x) { return (x>1) && ((x==2) || ((x&1) && (!(check(x))))); }
-
-void seive(int n)
-{
-    int i, j;
-    primes.push_back(2);
-    for(i=3; i*i<=n; i+=2){
-        if(!check(i)){
-            primes.push_back(i);
-            for(j=i*i; j<=n; j+=i<<1) mark(j);
-        }
-    }
-}
-
-
 // sieve :- prime number generator;
 // 0 for prime, 1 for not prime;
 
@@ -57,12 +31,104 @@ void sieve(int n)
 }
 
 
+// Block Sieve :
+// Block size, S = 1e4 to 1e5.
+// Output: returns number of primes
+
+int count_primes(int n) {
+    const int S = 10000;
+
+    vector<int> primes;
+    int nsqrt = sqrt(n);
+    vector<char> is_prime(nsqrt + 2, true);
+    for (int i = 2; i <= nsqrt; i++) {
+        if (is_prime[i]) {
+            primes.push_back(i);
+            for (int j = i * i; j <= nsqrt; j += i)
+                is_prime[j] = false;
+        }
+    }
+
+    int result = 0;
+    vector<char> block(S);
+    for (int k = 0; k * S <= n; k++) {
+        fill(block.begin(), block.end(), true);
+        int start = k * S;
+        for (int p : primes) {
+            int start_idx = (start + p - 1) / p;
+            int j = max(start_idx, p) * p - start;
+            for (; j < S; j += p)
+                block[j] = false;
+        }
+        if (k == 0)
+            block[0] = block[1] = false;
+        for (int i = 0; i < S && start + i <= n; i++) {
+            if (block[i])
+                result++;
+        }
+    }
+    return result;
+}
+
+
+
+// Segmented Sieve:
+// Output: prime list in range {L, R}; (R-L+1) <= 1e7 && R <= 1e12;
+vector<char> segmentedSieve(long long L, long long R) {
+    // generate all primes up to sqrt(R)
+    long long lim = sqrt(R);
+    vector<char> mark(lim + 1, false);
+    vector<long long> primes;
+    for (long long i = 2; i <= lim; ++i) {
+        if (!mark[i]) {
+            primes.emplace_back(i);
+            for (long long j = i * i; j <= lim; j += i)
+                mark[j] = true;
+        }
+    }
+
+    vector<char> isPrime(R - L + 1, true);
+    for (long long i : primes)
+        for (long long j = max(i * i, (L + i - 1) / i * i); j <= R; j += i)
+            isPrime[j - L] = false;
+    if (L == 1)
+        isPrime[0] = false;
+    return isPrime;
+}
+
+
+
+// Bitwise - sieve :- prime number generator;
+// 0 for prime, 1 for not prime;  >> Not sure ...
+
+#define MX 1000000000
+
+int marked[MX/64+2];
+vector<int> primes;
+
+#define mark(x) marked[x>>6] |= (1<<((x&63)>>1))
+#define check(x) (marked[x>>6] & (1<<((x&63)>>1)))
+
+bool isPrime(int x) { return (x>1) && ((x==2) || ((x&1) && (!(check(x))))); }
+
+void seive(int n)
+{
+    int i, j;
+    primes.push_back(2);
+    for(i=3; i*i<=n; i+=2){
+        if(!check(i)){
+            primes.push_back(i);
+            for(j=i*i; j<=n; j+=i<<1) mark(j);
+        }
+    }
+}
+
+
 
 // another sieve...
 // 1 for prime and 0 for not-prime...
 ll _sieve_size;
 bitset<10000010> bs;
-
 void sieve(ll upperbound)
 {
 	_sieve_size = upperbound + 1;
@@ -87,44 +153,3 @@ bool isPrime(ll n)
 }
 
 sieve(10000000);
-
-
-/// Segment sieve...
-/**
- * 
- * Description: Prime sieve for generating all primes smaller than LIM.
- * Status: Stress-tested
- * Time: LIM=1e9 $\approx$ 1.5s
- * Details: Despite its n log log n complexity, segmented sieve is still faster
- * than other options, including bitset sieves and linear sieves. This is
- * primarily due to its low memory usage, which reduces cache misses. This
- * implementation skips even numbers.
- *
- * Benchmark can be found here: https://ideone.com/e7TbX4
- *
- * The line `for (int i=idx; i<S+L; idx = (i += p))` is done on purpose for performance reasons.
- * Se https://github.com/kth-competitive-programming/kactl/pull/166#discussion_r408354338
- */
-#pragma once
-
-const int LIM = 1e6;
-bitset<LIM> isPrime;
-vi eratosthenes() {
-	const int S = round(sqrt(LIM)), R = LIM / 2;
-	vi pr = {2}, sieve(S+1); pr.reserve(int(LIM/log(LIM)*1.1));
-	vector<pii> cp;
-	for (int i = 3; i <= S; i += 2) if (!sieve[i]) {
-		cp.push_back({i, i * i / 2});
-		for (int j = i * i; j <= S; j += 2 * i) sieve[j] = 1;
-	}
-	for (int L = 1; L <= R; L += S) {
-		array<bool, S> block{};
-		for (auto &[p, idx] : cp)
-			for (int i=idx; i < S+L; idx = (i+=p)) block[i-L] = 1;
-		rep(i,0,min(S, R - L))
-			if (!block[i]) pr.push_back((L + i) * 2 + 1);
-	}
-	for (int i : pr) isPrime[i] = 1;
-	return pr;
-}
-
