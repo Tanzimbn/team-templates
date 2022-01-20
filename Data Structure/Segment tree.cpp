@@ -5,21 +5,21 @@ int sum[400001], num[100001];
 // keep num size 4*n;
 
 /// Building segment trees...
-void build(int at, int L, int R)
+void build(int at, int l, int r)
 {
 	sum[at] = 0;
 	
-	if(L==R){
+	if(l == r){
 		// keeping the sum...
 		// Or, maybe other queries...
-		sum[at] = num[L];
+		sum[at] = num[l];
 		
 		return;
 	}
 	
-	int mid = (L+R)/2;
-	build(at*2, L, mid);
-	build(at*2+1, mid+1, R);
+	int mid = (l+r)/2;
+	build(at*2, l, mid);
+	build(at*2+1, mid+1, r);
 	
 	// keeping the sum...
 	// Or, maybe other queries...
@@ -27,35 +27,35 @@ void build(int at, int L, int R)
 }
 
 /// Updating segment tree...
-void update(int at, int L, int R, int pos, int u)
+void update(int at, int l, int r, int idx, int num)
 {
-	if(L==R){
-		sum[at] += u;
+	if(l == r){
+		sum[at] += num;
 		return;
 	}
 	
-	int mid = (L+R)/2;
+	int mid = (l+r)/2;
 	
 	// instead of if-else
 	// we can use 
 	// if(pos < L || R < pos) return;
-	if(pos<=mid) update(at*2, L, mid, pos, u);
-	else update(at*2+1, mid+1, R, pos, u);
+	if(pos<=mid) update(at*2, l, mid, idx, num);
+	else update(at*2+1, mid+1, r, idx, num);
 	
 	sum[at] = sum[at*2] + sum[at*2+1];
 }
 
 
 /// Making queries in segment tree...
-int query(int at, int L, int R, int l, int r)
+int query(int at, int l, int r, int L, int R)
 {
 	// query from l to r.
-	if(r < L || l > R) return 0;
-	if(l <= L && R <= r) return sum[at];
+	if(R < l || L > r) return 0;
+	if(L <= l && r <= R) return sum[at];
 	
-	int mid = (L+R)/2;
-	int x = query(at*2, L, mid, l, r);
-	int y = query(at*2+1, mid+1, R, l, r);
+	int mid = (l+r)/2;
+	int x = query(at*2, l, mid, L, R);
+	int y = query(at*2+1, mid+1, r, L, R);
 	
 	return x+y;
 }
