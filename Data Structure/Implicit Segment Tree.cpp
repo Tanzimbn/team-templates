@@ -1,4 +1,5 @@
 // Implicit/Dynamic Segment tree
+/// Stress Test : Passed
 // Call it by: Vertex* node = new Vertex(1, n);
 
 struct Vertex{
