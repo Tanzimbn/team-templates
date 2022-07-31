@@ -31,6 +31,7 @@ void sieve(int n)
 }
 vector<pair<int, int> > divisors;
 void divs(int n) {
+	// O(sqrt(n))
 	int cnt, tot=1, i;
 	
 	for(i=0; i<(int)primes.size() && (primes[i]*primes[i])<=n; i++) {
