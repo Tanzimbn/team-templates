@@ -1,8 +1,5 @@
 /// Bicoloring using BFS...
-
-
 /// Note: If a graph contains cycle of odd length, then it isn't bicolorable.
-
 vector<vector<int> > edge;
 bool bicoloring(int n, int source)
 {
@@ -24,10 +21,8 @@ bool bicoloring(int n, int source)
                 else color[v] = 1;             // else color[v] will be red.
                 q.push(v);
             }
-
             if(color[u]==color[v]) return false; // If the color of both source u ans source v ara seme, than graph isn.t bicolorable..
         }
     }
-
     return true;
 }
