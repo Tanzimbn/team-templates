@@ -49,7 +49,6 @@ void MaxSumSubMatrix(int n)
     cout << ansleft << ' ' << ansright << ' ' << ansup << ' ' << ansdown << "\n";
 }
 
-
 // KADANE (1D)
 sum = ans = ara[0];
 int u = 0, v = 0;

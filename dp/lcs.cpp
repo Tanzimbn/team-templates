@@ -1,6 +1,4 @@
-// longest common subsequence...
-
-
+// longest common subsequence..
 int lcs(string& a, string& b, int len_a, int len_b)  
 {  
     int dp[len_a+1][len_b+1];  
